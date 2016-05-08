@@ -1,0 +1,11 @@
+{
+	"name": "tweak-gui",
+	"url": "http://samcodes.co.uk/code/",
+	"license": "MIT",
+	"tags": ["haxe", "html5", "js", "web", "ui", "utility"],
+	"description": "tweak-gui is a graphical user interface for changing variable values on the fly",
+	"version": "1.0.0",
+	"releasenote": "Initial release with DOM and three.js backends",
+	"contributors": ["samcodes"],
+	"dependencies": {}
+}
