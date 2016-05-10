@@ -2,18 +2,18 @@ package tweak.backend.dom;
 
 import js.Browser.document;
 import js.html.ButtonElement;
+import js.html.DOMError;
 import js.html.DivElement;
 import js.html.Element;
 import js.html.InputElement;
 import js.html.LIElement;
 import js.html.SelectElement;
+import js.html.TextAreaElement;
 import js.html.UListElement;
 import tweak.elements.Folder;
 import tweak.elements.FunctionProperty;
 import tweak.elements.IProperty;
 import tweak.util.Util.TypeMapping;
-import js.html.TextAreaElement;
-import js.html.DOMError;
 
 // A custom tweak-gui JavaScript/DOM backend
 @:access(tweak.elements.Folder)
@@ -59,7 +59,7 @@ class CustomDOMBackend implements IBackend {
 		rootToggleButton.innerHTML = "Open Controls";
 	}
 	
-	public function addFolder(folder:Folder):Folder {
+	public function addFolder(folder:Folder):Bool {
 		var isRoot = folder.parent == null;
 		
 		var folderContainer = createFolderContainer();
@@ -102,7 +102,7 @@ class CustomDOMBackend implements IBackend {
 		
 		showElement(folderContainer, folderToggle);
 		
-		return folder;
+		return true;
 	}
 	
 	public function removeFolder(folder:Folder):Bool {

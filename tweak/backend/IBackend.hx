@@ -5,11 +5,11 @@ import tweak.elements.FunctionProperty;
 import tweak.elements.IProperty;
 
 // tweak-gui backends implement this
-interface IBackend {
+interface IBackend {	
 	public function show(folder:Folder):Void;
 	public function hide(folder:Folder):Void;
 	
-	public function addFolder(folder:Folder):Folder;
+	public function addFolder(folder:Folder):Bool;
 	public function removeFolder(folder:Folder):Bool;
 	public function removeProperty(folder:Folder, property:IProperty):Bool;
 	public function openFolder(folder:Folder):Void;

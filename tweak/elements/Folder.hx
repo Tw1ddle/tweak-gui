@@ -73,8 +73,13 @@ class Folder extends BaseElement {
 		
 		var folder = new Folder(name, this);
 		folders.push(folder);
-		signal_didAddFolder.dispatch(parent, this);
-		var folder = backend.addFolder(folder);
+		var added = backend.addFolder(folder);
+		Sure.sure(added);
+		
+		if (added) {
+			signal_didAddFolder.dispatch(parent, this);
+		}
+		
 		return folder;
 	}
 	
@@ -170,14 +175,14 @@ class Folder extends BaseElement {
 	}
 	
 	public function addBooleanCheckbox(object:Dynamic, field:String, ?name:String):Folder {
-		Sure.sure(Reflect.hasField(object, field) && Std.is(Reflect.getProperty(object, field), Bool));
+		Sure.sure(verifyField(object, field));
 		backend.addBooleanCheckbox(this, makeProperty(object, field, name));
 		return this;
 	}
 	
 	/*
 	public function addBooleanSwitch(object:Dynamic, field:String, ?name:String):Folder {
-		Sure.sure(Reflect.hasField(object, field) && Std.is(Reflect.getProperty(object, field), Bool));
+		Sure.sure(verifyField(object, field));
 		backend.addBooleanSwitch(this, makeProperty(object, field, name));
 		return this;
 	}
@@ -190,13 +195,13 @@ class Folder extends BaseElement {
 	}
 	
 	public function addEnumSelect(object:Dynamic, field:String, ?name:String):Folder {
-		Sure.sure(Reflect.hasField(object, field) && Reflect.isEnumValue(Reflect.getProperty(object, field)));
+		Sure.sure(verifyField(object, field));
 		backend.addEnumSelect(this, makeProperty(object, field, name));
 		return this;
 	}
 	
 	public function addStringSelect(object:Dynamic, field:String, options:Array<String>, ?name:String):Folder {
-		Sure.sure(Reflect.hasField(object, field) && Std.is(Reflect.getProperty(object, field), String));
+		Sure.sure(verifyField(object, field));
 		backend.addStringSelect(this, makeProperty(object, field, name), options);
 		return this;
 	}
@@ -207,7 +212,7 @@ class Folder extends BaseElement {
 	}
 	
 	public function addNumericSlider(object:Dynamic, field:String, ?name:String, ?min:Null<Float>, ?max:Null<Float>):Folder {
-		Sure.sure(Reflect.hasField(object, field) && (Std.is(Reflect.getProperty(object, field), Int) || Std.is(Reflect.getProperty(object, field), Float)));
+		Sure.sure(verifyField(object, field));
 		
 		if (min == null) {
 			min = -1e20;
@@ -222,7 +227,7 @@ class Folder extends BaseElement {
 	
 	// TODO add min, max, step
 	public function addNumericSpinbox(object:Dynamic, field:String, ?name:String):Folder {
-		Sure.sure(Reflect.hasField(object, field) && (Std.is(Reflect.getProperty(object, field), Int) || Std.is(Reflect.getProperty(object, field), Float)));
+		Sure.sure(verifyField(object, field));
 		backend.addNumericSpinbox(this, makeProperty(object, field, name));
 		return this;
 	}
@@ -231,7 +236,7 @@ class Folder extends BaseElement {
 	
 	public function addStringEdit(object:Dynamic, field:String, ?name:String):Folder {
 		Sure.sure(object != null);
-		Sure.sure(Reflect.hasField(object, field) && (Std.is(Reflect.getProperty(object, field), String)));
+		Sure.sure(verifyField(object, field));
 		
 		backend.addStringEdit(this, makeProperty(object, field, name));
 		return this;
@@ -260,7 +265,7 @@ class Folder extends BaseElement {
 	public function addObject(object:Dynamic):Folder {
 		Sure.sure(object != null);
 		
-		var fields = Reflect.fields(object);
+		var fields = getFields(object);
 		
 		for (field in fields) {
 			addProperty(object, field);
@@ -284,7 +289,7 @@ class Folder extends BaseElement {
 		Sure.sure(name != null && name.length > 0);
 		Sure.sure(history >= 0);
 		
-		var fields = Reflect.fields(object);
+		var fields = getFields(object);
 		
 		for(field in fields) {
 			addWatch(object, field, history);
@@ -364,4 +369,33 @@ class Folder extends BaseElement {
 		this.folders = new Array<Folder>();
 		this.properties = new Array<IProperty>();
 	}
+	
+	private function getFields(object:Dynamic):Array<String> {
+		Sure.sure(object != null);
+		
+		#if js
+		return Reflect.fields(object);
+		#end
+		
+		#if (flash || windows)
+		var clazz = Type.getClass(object);
+		if (clazz == null) {
+			return Reflect.fields(object);
+		} else {
+			return Type.getInstanceFields(Type.getClass(object));
+		}
+		#end
+	}
+	
+	#if debug
+	private static inline function verifyField(object:Dynamic, field:String):Bool {		
+		#if js
+		return object != null && Reflect.hasField(object, field);
+		#else
+		return true;
+		#end
+	}
+	#else
+	private static inline function verifyField(object:Dynamic, field:String):Bool { return true;  }
+	#end
 }

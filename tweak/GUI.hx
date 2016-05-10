@@ -2,34 +2,42 @@ package tweak;
 
 import tweak.elements.Folder;
 
-#if customdomrenderer
+#if customdombackend
 import tweak.backend.dom.CustomDOMBackend;
-#elseif threejsrenderer
+#elseif threejsbackend
 import tweak.backend.three.ThreeJSBackend;
-#elseif haxeuirenderer
+#elseif haxeuibackend
 import tweak.backend.haxeui.HaxeUIBackend;
+#elseif stubbackend
+import tweak.backend.stub.StubBackend;
 #end
 
 // A top level GUI object. Create and add folders to it.
 class GUI extends Folder {
-	#if customdomrenderer
+	#if customdombackend
 	private function new(name:String) {
 		super(name, null);
 		backend = new CustomDOMBackend();
 		backend.addFolder(this);
 	}
-	#elseif threejsrenderer
+	#elseif threejsbackend
 	private function new(name:String) {
 		super(name, null);
 		backend = new ThreeJSBackend();
 		backend.addFolder(this);
 	}
-	#elseif haxeuirenderer
+	#elseif haxeuibackend
 	private function new(name:String) {
 		super(name, null);
 		backend = new HaxeUIBackend();
 		backend.addFolder(this);
-	}	
+	}
+	#elseif stubbackend
+	private function new(name:String) {
+		super(name, null);
+		backend = new StubBackend();
+		backend.addFolder(this);
+	}
 	#else
 	#error "No backend configured for this platform. Set the tweak-gui renderer in your build configuration."
 	#end
