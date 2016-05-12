@@ -1,50 +1,63 @@
 package tweak;
 
-import tweak.elements.Folder;
-
-#if customdombackend
+#if tweak_customdombackend
 import tweak.backend.dom.CustomDOMBackend;
-#elseif threejsbackend
+#elseif tweak_threejsbackend
 import tweak.backend.three.ThreeJSBackend;
-#elseif haxeuibackend
+#elseif tweak_haxeuibackend
 import tweak.backend.haxeui.HaxeUIBackend;
-#elseif stubbackend
+#elseif tweak_flixelbackend
+import tweak.backend.flixel.FlixelBackend;
+#elseif tweak_stubbackend
 import tweak.backend.stub.StubBackend;
 #end
 
-// A top level GUI object. Create and add folders to it.
+import tweak.backend.IBackend;
+import tweak.elements.Folder;
+
+/**
+ * A GUI instance is the starting point for all tweak-gui projects. It is a top level folder which holds child Folders and Properties.
+ * You can instantiate multiple GUIs - these will exist side-by-side in the layout provided by your chosen tweak-gui backend.
+ */
 class GUI extends Folder {
-	#if customdombackend
-	private function new(name:String) {
-		super(name, null);
-		backend = new CustomDOMBackend();
-		backend.addFolder(this);
-	}
-	#elseif threejsbackend
-	private function new(name:String) {
-		super(name, null);
-		backend = new ThreeJSBackend();
-		backend.addFolder(this);
-	}
-	#elseif haxeuibackend
-	private function new(name:String) {
-		super(name, null);
-		backend = new HaxeUIBackend();
-		backend.addFolder(this);
-	}
-	#elseif stubbackend
-	private function new(name:String) {
-		super(name, null);
-		backend = new StubBackend();
-		backend.addFolder(this);
-	}
-	#else
-	#error "No backend configured for this platform. Set the tweak-gui renderer in your build configuration."
-	#end
-	
-	// Create a new GUI with the provided name
+	/**
+	 * Instantiate a new GUI with the given display name
+	 * @param	name	The display name of the GUI folder
+	 * @return	The new GUI for chaining
+	 */ 
 	public static function create(name:String):GUI {
 		Sure.sure(name != null);
 		return new GUI(name);
+	}
+	
+	/**
+	 * Instantiate a new GUI
+	 * Private constructor, because the tweak-gui interface is fluent
+	 * @param	name	The display name of the GUI folder
+	 */
+	private function new(name:String) {
+		super(name, null);
+		this.backend = instantiateBackend();
+		this.backend.addFolder(this);
+	}
+	
+	/**
+	 * Instantiates a backend for this GUI instance
+	 * @return	A backend instance for this GUI
+	 */ 
+	private inline function instantiateBackend():IBackend {
+		#if tweak_customdombackend
+		return new CustomDOMBackend();
+		#elseif tweak_threejsbackend
+		return new ThreeJSBackend();
+		#elseif tweak_haxeuibackend
+		return new HaxeUIBackend();
+		#elseif tweak_flixelbackend
+		return new FlixelBackend();
+		#elseif tweak_stubbackend
+		return new StubBackend();
+		#else
+		#error "No backend configured for this platform. Set the desired tweak-gui backend in your build configuration."
+		#end
 	}
 }

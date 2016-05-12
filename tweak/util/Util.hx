@@ -4,7 +4,9 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 
-// Map some Haxe types to string ids
+/**
+ * Maps Haxe types to string ids
+ */
 @:enum abstract TypeMapping(String) from (String) {
     var BOOL = "b";
     var FLOAT = "f";
@@ -14,6 +16,11 @@ import haxe.macro.Type;
 
 class Util
 {
+	/**
+	 * 
+	 * @param	f
+	 * @return
+	 */
     public macro static function getTypes(f:Expr):ExprOf<String> {
         var type:Type = Context.typeof(f);
         if (!Reflect.hasField(type, 'args')) {
@@ -49,7 +56,6 @@ class Util
         return macro $v{signature};
     }
 	
-	/*
 	// Macro that returns the full type names of function parameters (excluding package names)
 	// Doesn't support functions, generics and probably other stuff
 	public macro static function getFunctionParameterTypes(f:Expr):ExprOf<Array<String>> {
@@ -76,5 +82,4 @@ class Util
 		}
 		return macro $a{signature};
 	}
-	*/
 }

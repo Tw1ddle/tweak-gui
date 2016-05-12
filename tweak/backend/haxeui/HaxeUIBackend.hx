@@ -2,27 +2,35 @@ package tweak.backend.haxeui;
 
 import haxe.ui.toolkit.containers.VBox;
 import haxe.ui.toolkit.controls.Button;
+import haxe.ui.toolkit.controls.Scroll;
+import haxe.ui.toolkit.controls.VScroll;
 import haxe.ui.toolkit.core.Root;
 import haxe.ui.toolkit.core.StyleableDisplayObject;
 import haxe.ui.toolkit.core.Toolkit;
+import haxe.ui.toolkit.core.interfaces.IDisplayObject;
 import haxe.ui.toolkit.core.interfaces.InvalidationFlag;
 import haxe.ui.toolkit.themes.GradientTheme;
 import tweak.elements.Folder;
 import tweak.elements.FunctionProperty;
 import tweak.elements.IProperty;
+import tweak.util.FileReader;
 
 // A haxeui backend
 @:access(tweak.elements.Folder)
 class HaxeUIBackend implements IBackend {
-	private var root:VBox;
+	private var root:VScroll;
 	
 	public function new() {
 		Toolkit.theme = new GradientTheme();
 		Toolkit.init();
-		root = new VBox();
+		var view:IDisplayObject = Toolkit.processXml(Xml.parse(FileReader.readFile("lib/tweak/backend/haxeui/root_layout.xml")));
+		root = new VScroll();
 		root.text = "Root";
 		Toolkit.openFullscreen(function(root:Root) {
-			root.addChild(this.root);
+			//root.addChild(this.root);
+			
+			// TODO populate a skeleton root view with elements, and define xml/code layouts for common skeleton items e.g. properties, folders etc
+			root.addChild(view);
 		});
 	}
 	

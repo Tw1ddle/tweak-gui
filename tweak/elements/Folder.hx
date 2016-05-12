@@ -385,6 +385,8 @@ class Folder extends BaseElement {
 			return Type.getInstanceFields(Type.getClass(object));
 		}
 		#end
+		
+		return []; // TODO
 	}
 	
 	#if debug

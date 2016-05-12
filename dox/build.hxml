@@ -1,0 +1,7 @@
+-xml types.xml
+-D tweak_stubbackend
+-lib msignal
+-lib Sure
+-cp ..
+Main
+--no-output

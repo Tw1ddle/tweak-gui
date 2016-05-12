@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<vbox width="20%" height="100%" id="main" xmlns:ui="haxe:ui" xmlns:style="haxe:style" xmlns:data="haxe:data" xmlns:selection="haxe:selection" xmlns:sys="haxe:sys">
+	<button id="BackButton" text="Go Back!" width="100%"  />
+	<accordion id="EmulationAccordian" width="100%" height="100%">
+		<vbox text="Device Manufacturers" width="100%" height="100%">
+			<scrollview width="100%" height="100%">
+				<vbox width="100%" height="100%">
+					<accordion id="ManufacturerAccordian" width="100%" height="100%">
+						<vbox text="Acer" width="100%" height="100%">
+							<button id="IconiaTabA110" text="Iconia Tab A110" width="100%" />
+							<button id="IconiaTabA511" text="Iconia Tab A511" width="100%" />
+							<button id="IconiaTabA701" text="Iconia Tab A701" width="100%" />
+							<button id="IconiaTabW700" text="Iconia Tab W700" width="100%" />
+						</vbox>
+						<vbox text="Ainol" width="100%" height="100%">
+							<button id="Novo7Crystal" text="Novo 7 Crystal" width="100%" />
+							<button id="Novo7Aurora" text="Novo 7 Aurora" width="100%" />
+							<button id="Novo7Fire" text="Novo 7 Fire" width="100%" />
+							<button id="Novo10Hero" text="Novo 10 Hero" width="100%" />
+							<button id="Novo9Spark" text="Novo 9 Spark" width="100%" />
+						</vbox>
+					</accordion>
+				</vbox>
+			</scrollview>
+		</vbox>
+	</accordion>
+</vbox>

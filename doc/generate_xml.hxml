@@ -1,6 +1,0 @@
--cmd cd gen
-
---next
-
--js all.js
--xml ../bin/xml/js.xml
