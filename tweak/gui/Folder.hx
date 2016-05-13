@@ -1,32 +1,91 @@
-package tweak.elements;
+package tweak.gui;
 
+import haxe.Constraints.Function;
 import msignal.Signal.Signal1;
 import msignal.Signal.Signal2;
 import tweak.backend.IBackend;
-import tweak.elements.IProperty;
+import tweak.gui.Property;
 
 // TODO disable folder updates when closed, or add an option for that
 // TODO disable properties (stop them from being edited) and disable/enable all folder contents
 // TODO addFolder/WatchForTypes (only add/watch specific types, exclude only specific types, named fields etc...)
 
-// Base class for tweak GUI folders.
-// A folder contains properties, child folders, and can be opened or closed.
+/**
+ * A tweak-gui folder. A folder holds properties and other folders.
+ * Folders can be opened, closed, or removed from their parent Folder or GUI.
+ */
 class Folder extends BaseElement {
-	private var backend:IBackend; // Handle to the platform/rendering backend for the GUI
-	private var parent:Folder; // Parent folder. Null if and only if the folder is at the root of a hierarchy
-	private var folders:Array<Folder>; // Child folders i.e. subfolders
-	private var properties:Array<IProperty>; // Properties i.e. individual entries within folders
+	/**
+	 * Handle to the platform/rendering tweak-gui backend for this folder.
+	 */
+	private var backend:IBackend;
 	
-	public var signal_didUpdate(default, null) = new Signal1<Folder>(); // Triggers after it and all child folders have updated
-	public var signal_didAddFolder(default, null) = new Signal2<Folder, Folder>(); // Triggers after a folder is added to this folder
-	public var signal_didRemoveFolder(default, null) = new Signal2<Folder, Folder>(); // Triggers after a folder is removed from this folder
-	public var signal_didAddProperty(default, null) = new Signal2<Folder, IProperty>(); // Triggers after a property is added to this folder
-	public var signal_didRemoveProperty(default, null) = new Signal2<Folder, IProperty>(); // Triggers after a property is removed from this folder
-	public var signal_didOpen(default, null) = new Signal1<Folder>(); // Triggers after this folder is opened
-	public var signal_didClose(default, null) = new Signal1<Folder>(); // Triggers after this folder is closed
+	/**
+	 * The parent of this folder. This should only be null if the folder is at the root of a hierarchy, and is a GUI.
+	 */
+	private var parent:Folder;
 	
-	// Updates all folders and properties
-	public function update():Void {
+	/**
+	 * The immediate child folders (subfolders) that currently exist in this folder.
+	 */
+	private var folders:Array<Folder>;
+	
+	/**
+	 * The properties that currently exist on this folder, not including properties on child folders.
+	 */
+	private var properties:Array<BaseProperty>;
+	
+	/**
+	 * A signal that is dispatched after this folder and all child folders (and properties) have updated.
+	 * @param	first	This folder.
+	 */
+	public var signal_didUpdate(default, null) = new Signal1<Folder>();
+	
+	/**
+	 * A signal that is dispatched after another folder is added to this folder.
+	 * @param	first	This folder.
+	 * @param	second	The folder added to this folder.
+	 */
+	public var signal_didAddFolder(default, null) = new Signal2<Folder, Folder>();
+	
+	/**
+	 * A signal that is dispatched after a child folder is removed from this current.
+	 * @param	first	This folder.
+	 * @param	second	The folder removed from this folder.
+	 */
+	public var signal_didRemoveFolder(default, null) = new Signal2<Folder, Folder>();
+	
+	/**
+	 * A signal that is dispatched after a new property is added to this folder.
+	 * @param	first	This folder.
+	 * @param	second	The property added to this folder.
+	 */
+	public var signal_didAddProperty(default, null) = new Signal2<Folder, BaseProperty>();
+	
+	/**
+	 * A signal that is dispatched after a property in this folder is removed.
+	 * @param	first	This folder.
+	 * @param	second	The property removed from this folder.
+	 */
+	public var signal_didRemoveProperty(default, null) = new Signal2<Folder, BaseProperty>();
+	
+	/**
+	 * A signal that is dispatched after this folder is closed.
+	 * @param	first	This folder.
+	 */
+	public var signal_didOpen(default, null) = new Signal1<Folder>();
+	
+	/**
+	 * A signal that is dispatched after this folder is closed.
+	 * @param	first	This folder.
+	 */
+	public var signal_didClose(default, null) = new Signal1<Folder>();
+	
+	/**
+	 * Updates all the properties in this folder, and then calls update on all child folders in an unspecified order.
+	 * Dispatches the didUpdate signal.
+	 */
+	override public function update():Void {
 		for (property in properties) {
 			property.update();
 		}
@@ -40,36 +99,53 @@ class Folder extends BaseElement {
 		signal_didUpdate.dispatch(this);
 	}
 	
-	// Show the folder
-	public function show():Folder {
-		backend.show(this);
-		return this;
-	}
-	
-	// Hide the folder
-	public function hide():Folder {
-		backend.hide(this);
-		return this;
-	}
-	
-	// Open the folder
+	/**
+	 * Opens this folder.
+	 * @return This folder.
+	 */
 	public function open():Folder {
 		backend.openFolder(this);
 		signal_didOpen.dispatch(this);
 		return this;
 	}
 	
-	// Collapse/close the folder
+	/**
+	 * Collapses this folder.
+	 * @return This folder.
+	 */
 	public function close():Folder {
 		backend.closeFolder(this);
 		signal_didClose.dispatch(this);
 		return this;
 	}
 	
-	// Add a subfolder to the folder with the given name
-	// Returns the newly added folder, note that this makes it unlike the rest of the interface
-	public function addFolder(name:String, updateWhenClosed:Bool = true):Folder {
+	/**
+	 * Shows this folder.
+	 * @return This folder.
+	 */
+	public function show():Folder {
+		backend.show(this);
+		return this;
+	}
+	
+	/**
+	 * Hides this folder.
+	 * @return This folder.
+	 */
+	public function hide():Folder {
+		backend.hide(this);
+		return this;
+	}
+	
+	/**
+	 * Adds a new subfolder with the given display name to this folder.
+	 * @param	name	The display name for the new folder.
+	 * @return	The newly added folder - important, this makes this method different from the rest of the fluid interface.
+	 */
+	public function addFolder(name:String):Folder {
 		Sure.sure(name != null && name.length > 0);
+		
+		// TODO handle updateWhenClosed?
 		
 		var folder = new Folder(name, this);
 		folders.push(folder);
@@ -83,8 +159,11 @@ class Folder extends BaseElement {
 		return folder;
 	}
 	
-	// Remove self from the GUI
-	// Removes itself from the parent, and then from the backend
+	/**
+	 * Removes this folder from the GUI.
+	 * The folder removes itself from it's own parent, and then from the backend.
+	 * @return	This folder.
+	 */
 	public function remove():Folder {
 		if(parent != null) {
 			var removed = parent.folders.remove(this);
@@ -101,8 +180,15 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Attempts to add a property control automatically by reflecting on the property type
-	public function addProperty(object:Dynamic, field:String):Folder {
+	/**
+	 * Attempts to add a property control to this folder automatically, by reflecting on the property type.
+	 * Note, beware of reference loops with nested objects, as these will cause an infinite loop in this method.
+	 * It is impossible to get the number of parameters a function takes in a cross platform way using reflection, so text labels are added instead of function controls.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @return	This folder.
+	 */
+	public function addProperty<T:{}>(object:T, field:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(field != null && field.length > 0);
 		var property = Reflect.getProperty(object, field);
@@ -114,19 +200,26 @@ class Folder extends BaseElement {
 		} else if (Std.is(property, Bool)) {
 			addBooleanCheckbox(object, field);
 		} else if (Reflect.isFunction(property)) {
-			addPlaceholder(object, field); // Cannot get the number of parameters dynamically in a simple cross platform way, so add a label instead
+			addPlaceholder(object, field);
 		} else if (Reflect.isEnumValue(property)) {
 			addEnumSelect(object, field);
 		} else if (Reflect.isObject(property)) {
 			var folder = addFolder(field);
-			folder.addObject(property); // Note, beware of reference loops, can cause infinite loops
+			folder.addObject(property); 
 		}
 		
 		return this;
 	}
 	
-// Adds a readonly view containing the values of the property, with a history of the last 'history' number of values
-	public function addWatch(object:Dynamic, field:String, history:Int):Folder {
+	/**
+	 * Adds a watch property view to this folder.
+	 * A watch is a way to watch the value of a variable, a bit like in a debugger.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	history	The number of previous values the watch view will display.
+	 * @return	This folder.
+	 */
+	public function addWatch<T:{}>(object:T, field:String, history:UInt):Folder {
 		Sure.sure(object != null);
 		Sure.sure(field != null && field.length > 0);
 		
@@ -143,8 +236,12 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Remove a property from the folder
-	public function removeProperty(property:IProperty):Folder {
+	/**
+	 * Remove a property from this folder.
+	 * @param	property	The property to remove from this folder.
+	 * @return	This folder.
+	 */
+	public function removeProperty(property:Property):Folder {
 		Sure.sure(property != null);
 		
 		var removed:Bool = properties.remove(property);
@@ -159,13 +256,15 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Add a placeholder entry for items tweak-gui cannot properly represent
-	public function addPlaceholder(object:Dynamic, field:String, ?name:String):Folder {
+	/**
+	 * 
+	 */
+	public function addPlaceholder<T:{}>(object:T, field:String, ?name:String):Folder {
 		backend.addPlaceholder(this, makeProperty(object, field, name));
 		return this;
 	}
 	
-	public function addWatchTextArea(object:Dynamic, field:String, history:Int):Folder {
+	public function addWatchTextArea<T:{}>(object:T, field:String, history:Int):Folder {
 		Sure.sure(object != null);
 		Sure.sure(field != null && field.length > 0);
 		
@@ -174,44 +273,44 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	public function addBooleanCheckbox(object:Dynamic, field:String, ?name:String):Folder {
+	public function addBooleanCheckbox<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addBooleanCheckbox(this, makeProperty(object, field, name));
 		return this;
 	}
 	
 	/*
-	public function addBooleanSwitch(object:Dynamic, field:String, ?name:String):Folder {
+	public function addBooleanSwitch<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addBooleanSwitch(this, makeProperty(object, field, name));
 		return this;
 	}
 	*/
 	
-	public function addColorPicker(object:Dynamic, field:String, ?name:String):Folder {
+	public function addColorPicker<T:{}>(object:T, field:String, ?name:String):Folder {
 		// TODO sure rgb/xyz?
 		backend.addColorPicker(this, makeProperty(object, field, name));
 		return this;
 	}
 	
-	public function addEnumSelect(object:Dynamic, field:String, ?name:String):Folder {
+	public function addEnumSelect<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addEnumSelect(this, makeProperty(object, field, name));
 		return this;
 	}
 	
-	public function addStringSelect(object:Dynamic, field:String, options:Array<String>, ?name:String):Folder {
+	public function addStringSelect<T:{}>(object:T, field:String, options:Array<String>, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addStringSelect(this, makeProperty(object, field, name), options);
 		return this;
 	}
 	
-	public function addItemSelect<T>(object:Dynamic, field:String, items:Array<T>, ?name:String):Folder {
+	public function addItemSelect<T:{}>(object:T, field:String, items:Array<T>, ?name:String):Folder {
 		// TODO? dropdown list of anything
 		return this;
 	}
 	
-	public function addNumericSlider(object:Dynamic, field:String, ?name:String, ?min:Null<Float>, ?max:Null<Float>):Folder {
+	public function addNumericSlider<T:{}>(object:T, field:String, ?name:String, ?min:Null<Float>, ?max:Null<Float>):Folder {
 		Sure.sure(verifyField(object, field));
 		
 		if (min == null) {
@@ -226,7 +325,7 @@ class Folder extends BaseElement {
 	}
 	
 	// TODO add min, max, step
-	public function addNumericSpinbox(object:Dynamic, field:String, ?name:String):Folder {
+	public function addNumericSpinbox<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addNumericSpinbox(this, makeProperty(object, field, name));
 		return this;
@@ -234,7 +333,7 @@ class Folder extends BaseElement {
 	
 	//public function addNumericGraph // TODO
 	
-	public function addStringEdit(object:Dynamic, field:String, ?name:String):Folder {
+	public function addStringEdit<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(verifyField(object, field));
 		
@@ -252,7 +351,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Convenience method that creates a new folder, adds the object to it, and adds it to this folder
-	public function addFolderForObject(object:Dynamic, name:String):Folder {
+	public function addFolderForObject<T:{}>(object:T, name:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(name != null && name.length > 0);
 		
@@ -262,7 +361,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Add the object's fields to the GUI as properties
-	public function addObject(object:Dynamic):Folder {
+	public function addObject<T:{}>(object:T):Folder {
 		Sure.sure(object != null);
 		
 		var fields = getFields(object);
@@ -274,7 +373,7 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	public function addFolderForObjectWatch(object:Dynamic, name:String, history:Int = 50):Folder {
+	public function addFolderForObjectWatch<T:{}>(object:T, name:String, history:Int = 50):Folder {
 		Sure.sure(object != null);
 		Sure.sure(name != null && name.length > 0);
 		
@@ -284,7 +383,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Adds the object's fields to the GUI as watches
-	public function addWatchObject(object:Dynamic, name:String, history:Int):Folder {
+	public function addWatchObject<T:{}>(object:T, name:String, history:Int):Folder {
 		Sure.sure(object != null);
 		Sure.sure(name != null && name.length > 0);
 		Sure.sure(history >= 0);
@@ -299,7 +398,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Adds a graph widget that plots the value every time it changes
-	public function addNumericGraph(object:Dynamic, field:String, ?name:String):Folder {
+	public function addNumericGraph<T:{}>(object:T,field:String, ?name:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(field != null && field.length > 0);
 		
@@ -307,7 +406,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Adds an object's fields the GUI, excluding fields in the provided array
-	public function addObjectExcludingFields(object:Dynamic, excludeFields:Array<String>):Folder {
+	public function addObjectExcludingFields<T:{}>(object:T, excludeFields:Array<String>):Folder {
 		Sure.sure(object != null);
 		Sure.sure(excludeFields != null);
 		
@@ -325,7 +424,7 @@ class Folder extends BaseElement {
 	}
 	
 	// Attempts to add only the provided fields to the object's GUI
-	public function addObjectIncludingFields(object:Dynamic, includeFields:Array<String>):Folder {
+	public function addObjectIncludingFields<T:{}>(object:T, includeFields:Array<String>):Folder {
 		Sure.sure(object != null);
 		Sure.sure(includeFields != null);
 		
@@ -339,7 +438,7 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	private inline function makeProperty(object:Dynamic, field:String, ?name:String):IProperty {
+	private inline function makeProperty<T:{}>(object:T, field:String, ?name:String):Property {
 		Sure.sure(object != null);
 		Sure.sure(field != null);
 		
@@ -349,7 +448,7 @@ class Folder extends BaseElement {
 		return property;
 	}
 	
-	private inline function makeFunctionProperty<T>(func:T, parameterTypes:String, ?name:String):FunctionProperty {
+	private inline function makeFunctionProperty<T:Function>(func:T, parameterTypes:String, ?name:String):FunctionProperty {
 		Sure.sure(func != null);
 		Sure.sure(parameterTypes != null);
 		
@@ -367,10 +466,10 @@ class Folder extends BaseElement {
 			this.backend = parent.backend;
 		}
 		this.folders = new Array<Folder>();
-		this.properties = new Array<IProperty>();
+		this.properties = new Array<BaseProperty>();
 	}
 	
-	private function getFields(object:Dynamic):Array<String> {
+	private function getFields<T:{}>(object:T):Array<String> {
 		Sure.sure(object != null);
 		
 		#if js
@@ -390,7 +489,7 @@ class Folder extends BaseElement {
 	}
 	
 	#if debug
-	private static inline function verifyField(object:Dynamic, field:String):Bool {		
+	private static inline function verifyField<T:{}>(object:T, field:String):Bool {		
 		#if js
 		return object != null && Reflect.hasField(object, field);
 		#else
@@ -398,6 +497,8 @@ class Folder extends BaseElement {
 		#end
 	}
 	#else
-	private static inline function verifyField(object:Dynamic, field:String):Bool { return true;  }
+	private static inline function verifyField<T:{}>(object:T, field:String):Bool {
+		return true; // TODO?
+	}
 	#end
 }

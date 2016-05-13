@@ -2,7 +2,6 @@ package tweak.backend.haxeui;
 
 import haxe.ui.toolkit.containers.VBox;
 import haxe.ui.toolkit.controls.Button;
-import haxe.ui.toolkit.controls.Scroll;
 import haxe.ui.toolkit.controls.VScroll;
 import haxe.ui.toolkit.core.Root;
 import haxe.ui.toolkit.core.StyleableDisplayObject;
@@ -10,13 +9,15 @@ import haxe.ui.toolkit.core.Toolkit;
 import haxe.ui.toolkit.core.interfaces.IDisplayObject;
 import haxe.ui.toolkit.core.interfaces.InvalidationFlag;
 import haxe.ui.toolkit.themes.GradientTheme;
-import tweak.elements.Folder;
-import tweak.elements.FunctionProperty;
-import tweak.elements.IProperty;
+import tweak.gui.Folder;
+import tweak.gui.FunctionProperty;
+import tweak.gui.Property;
 import tweak.util.FileReader;
 
-// A haxeui backend
-@:access(tweak.elements.Folder)
+/**
+ * A haxeui 1.* backend for tweak-gui.
+ */ 
+@:access(tweak.gui.Folder)
 class HaxeUIBackend implements IBackend {
 	private var root:VScroll;
 	
@@ -68,7 +69,7 @@ class HaxeUIBackend implements IBackend {
 		return removed != null;
 	}
 	
-	public function removeProperty(folder:Folder, property:IProperty):Bool {
+	public function removeProperty(folder:Folder, property:Property):Bool {
 		var f = findFolder(folder);
 		var prop = findProperty(property, folder);
 		var removed = f.removeChild(prop, true);
@@ -84,51 +85,51 @@ class HaxeUIBackend implements IBackend {
 		
 	}
 	
-	public function addPlaceholder(folder:Folder, property:IProperty):Void {
+	public function addPlaceholder(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	//public function addBooleanSwitch(folder:Folder, property:IProperty):Void; /* Unimplemented */
+	//public function addBooleanSwitch(folder:Folder, property:Property):Void; /* Unimplemented */
 	
-	public function addBooleanCheckbox(folder:Folder, property:IProperty):Void {
+	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addColorPicker(folder:Folder, property:IProperty):Void {
+	public function addColorPicker(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addEnumSelect(folder:Folder, property:IProperty):Void {
+	public function addEnumSelect(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addStringSelect(folder:Folder, property:IProperty, options:Array<String>):Void {
+	public function addStringSelect(folder:Folder, property:Property, options:Array<String>):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addNumericSlider(folder:Folder, property:IProperty, min:Float, max:Float):Void {
+	public function addNumericSlider(folder:Folder, property:Property, min:Float, max:Float):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addNumericSpinbox(folder:Folder, property:IProperty):Void {
+	public function addNumericSpinbox(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addStringEdit(folder:Folder, property:IProperty):Void {
+	public function addStringEdit(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
@@ -140,19 +141,19 @@ class HaxeUIBackend implements IBackend {
 		//f.layout.refresh();
 	}
 	
-	public function addNumericGraph(folder:Folder, property:IProperty):Void {
+	public function addNumericGraph(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	public function addWatchTextArea(folder:Folder, property:IProperty, history:Int):Void {
+	public function addWatchTextArea(folder:Folder, property:Property, history:Int):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));
 		//f.layout.refresh();
 	}
 	
-	private function makeProperty(property:IProperty):Button {
+	private function makeProperty(property:Property):Button {
 		var item = new Button();
 		item.id = getPropertyId(property);
 		item.text = property.name;
@@ -163,7 +164,7 @@ class HaxeUIBackend implements IBackend {
 		return Std.string(f.id);
 	}
 	
-	private inline function getPropertyId(p:IProperty):String {
+	private inline function getPropertyId(p:Property):String {
 		return Std.string(p.id);
 	}
 	
@@ -173,7 +174,7 @@ class HaxeUIBackend implements IBackend {
 		return folder;
 	}
 	
-	private inline function findProperty(property:IProperty, folder:Folder):StyleableDisplayObject {
+	private inline function findProperty(property:Property, folder:Folder):StyleableDisplayObject {
 		var f = findFolder(folder);
 		var property = f.findChild(getFolderId(folder), null, true);
 		Sure.sure(property != null);

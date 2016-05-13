@@ -10,13 +10,16 @@ import js.html.LIElement;
 import js.html.SelectElement;
 import js.html.TextAreaElement;
 import js.html.UListElement;
-import tweak.elements.Folder;
-import tweak.elements.FunctionProperty;
-import tweak.elements.IProperty;
+import tweak.gui.Folder;
+import tweak.gui.FunctionProperty;
+import tweak.gui.Property;
 import tweak.util.Util.TypeMapping;
+import tweak.gui.BaseElement;
 
-// A custom tweak-gui JavaScript/DOM backend
-@:access(tweak.elements.Folder)
+/**
+ * A custom JavaScript/DOM backend for tweak-gui.
+ */ 
+@:access(tweak.gui.Folder)
 class CustomDOMBackend implements IBackend {
 	private var rootContainer:DivElement;
 	private var rootFolder:UListElement;
@@ -129,7 +132,7 @@ class CustomDOMBackend implements IBackend {
 	}
 	
 	// Helper function to add common property label contents, and styling for the colored swatch
-	private function addLabelPropertyShell(folder:Folder, property:IProperty, swatchClass:String):LIElement {
+	private function addLabelPropertyShell(folder:Folder, property:BaseElement, swatchClass:String):LIElement {
 		var folderList = document.getElementById(getIdForFolderList(folder));
 		
 		var propertySwatchItem = createPropertySwatchElement(swatchClass);
@@ -152,6 +155,7 @@ class CustomDOMBackend implements IBackend {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		// TODO make the function property gather the values of these properties and run when the button is pressed!
+		/*
 		for (i in 0...property.parameters.length) {
 			container.appendChild(switch(property.parameters.charAt(i)) {
 				case TypeMapping.BOOL:
@@ -166,6 +170,7 @@ class CustomDOMBackend implements IBackend {
 					throw "Unsupported parameter type";
 			});
 		}
+		*/
 		
 		var buttonElement = document.createButtonElement();
 		buttonElement.className = "tweak-gui-call-function-button";
@@ -177,7 +182,7 @@ class CustomDOMBackend implements IBackend {
 		container.appendChild(buttonElement);
 	}
 	
-	public function removeProperty(folder:Folder, property:IProperty):Bool {
+	public function removeProperty(folder:Folder, property:Property):Bool {
 		var folderList = document.getElementById(getIdForFolderList(folder));
 		var propertyContainer = document.getElementById(getIdForPropertyContainer(property));
 		
@@ -190,21 +195,21 @@ class CustomDOMBackend implements IBackend {
 		return true;
 	}
 	
-	public function addPlaceholder(folder:Folder, property:IProperty):Void {
+	public function addPlaceholder(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-placeholder-swatch");
 		var placeholder = createPlaceholder(property);
 		propertyListItem.appendChild(placeholder);
 	}
 	
 	/*
-	public function addBooleanSwitch(folder:Folder, property:IProperty):Void {
+	public function addBooleanSwitch(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-boolean-switch-swatch");
 		var switchElement = createSwitch(property);
 		propertyListItem.appendChild(switchElement);
 	}
 	*/
 	
-	public function addBooleanCheckbox(folder:Folder, property:IProperty):Void {
+	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-boolean-checkbox-swatch");
 		var checkbox = createCheckbox(property);
 		propertyListItem.appendChild(checkbox);
@@ -215,48 +220,48 @@ class CustomDOMBackend implements IBackend {
 		addFunctionActivator(property, propertyListItem);
 	}
 	
-	public function addStringSelect(folder:Folder, property:IProperty, options:Array<String>):Void {
+	public function addStringSelect(folder:Folder, property:Property, options:Array<String>):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-string-select-swatch");
 		var select = createStringSelect(property, options);
 		propertyListItem.appendChild(select);
 	}
 	
-	public function addEnumSelect(folder:Folder, property:IProperty):Void {
+	public function addEnumSelect(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-enum-select-swatch");
 		var select = createEnumSelect(property);
 		propertyListItem.appendChild(select);
 	}
 	
-	public function addNumericSpinbox(folder:Folder, property:IProperty):Void {
+	public function addNumericSpinbox(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-numeric-spinbox-swatch");
 		var spinbox = createNumericSpinbox(property);
 		propertyListItem.appendChild(spinbox);
 	}
 	
-	public function addNumericSlider(folder:Folder, property:IProperty, min:Float, max:Float):Void {
+	public function addNumericSlider(folder:Folder, property:Property, min:Float, max:Float):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-numeric-slider-swatch");
 		var slider = createNumericSlider(property, min, max);
 		propertyListItem.appendChild(slider);		
 	}
 	
-	public function addStringEdit(folder:Folder, property:IProperty):Void {
+	public function addStringEdit(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-string-edit-swatch");
 		var stringEdit = createStringEdit(property);
 		propertyListItem.appendChild(stringEdit);
 	}
 	
-	public function addColorPicker(folder:Folder, property:IProperty):Void {
+	public function addColorPicker(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-color-picker-swatch");
 		// TODO
 	}
 	
-	public function addWatchTextArea(folder:Folder, property:IProperty, history:Int):Void {
+	public function addWatchTextArea(folder:Folder, property:Property, history:Int):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-watch-view-swatch");
 		var watchView = createWatchView(property, propertyListItem, history);
 		propertyListItem.appendChild(watchView);
 	}
 	
-	public function addNumericGraph(folder:Folder, property:IProperty):Void {
+	public function addNumericGraph(folder:Folder, property:Property):Void {
 		// TODO
 	}
 	
@@ -348,7 +353,7 @@ class CustomDOMBackend implements IBackend {
 		return swatch;
 	}
 	
-	private inline function createPlaceholder(property:IProperty):DivElement {
+	private inline function createPlaceholder(property:Property):DivElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var element = document.createDivElement();
@@ -358,7 +363,7 @@ class CustomDOMBackend implements IBackend {
 		return element;
 	}
 	
-	private inline function createCheckbox(property:IProperty):InputElement {
+	private inline function createCheckbox(property:Property):InputElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var checkbox = document.createInputElement();
@@ -379,7 +384,7 @@ class CustomDOMBackend implements IBackend {
 	}
 	
 	/*
-	private inline function createSwitch(property:IProperty):DivElement {
+	private inline function createSwitch(property:Property):DivElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var switchContainer = document.createDivElement();
@@ -420,7 +425,7 @@ class CustomDOMBackend implements IBackend {
 	}
 	*/
 	
-	private inline function createStringEdit(property:IProperty):InputElement {
+	private inline function createStringEdit(property:Property):InputElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var textElement = document.createInputElement();
@@ -441,7 +446,7 @@ class CustomDOMBackend implements IBackend {
 		return textElement;
 	}
 	
-	private inline function createStringSelect(property:IProperty, options:Array<String>):SelectElement {
+	private inline function createStringSelect(property:Property, options:Array<String>):SelectElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var select = document.createSelectElement();
@@ -461,7 +466,7 @@ class CustomDOMBackend implements IBackend {
 		return select;
 	}
 	
-	private inline function createEnumSelect(property:IProperty):SelectElement {
+	private inline function createEnumSelect(property:Property):SelectElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var select = document.createSelectElement();
@@ -484,7 +489,7 @@ class CustomDOMBackend implements IBackend {
 	}
 	
 	var lastDragY:Float = 0; // For keeping track of mouse drag events, so the user can press and move the mouse to change the numeric value
-	private inline function createNumericSpinbox(property:IProperty):InputElement {
+	private inline function createNumericSpinbox(property:Property):InputElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var inputElement = document.createInputElement();
@@ -527,7 +532,7 @@ class CustomDOMBackend implements IBackend {
 		return inputElement;
 	}
 	
-	private inline function createNumericSlider(property:IProperty, min:Float, max:Float):InputElement {
+	private inline function createNumericSlider(property:Property, min:Float, max:Float):InputElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var inputElement = document.createInputElement();
@@ -549,7 +554,7 @@ class CustomDOMBackend implements IBackend {
 		return inputElement;
 	}
 	
-	private inline function createWatchView(property:IProperty, propertyListItem:Element, history:Int):TextAreaElement {
+	private inline function createWatchView(property:Property, propertyListItem:Element, history:Int):TextAreaElement {
 		var id = property.name + "-" + Std.string(property.id);
 		
 		var textAreaElement = document.createTextAreaElement();
@@ -595,7 +600,7 @@ class CustomDOMBackend implements IBackend {
 		return "tweak-gui-folder-toggle-button" + Std.string(element.id);
 	}
 	
-	private inline function getIdForPropertyContainer(element:IProperty):String {
+	private inline function getIdForPropertyContainer(element:BaseElement):String {
 		return "tweak-gui-property-container" + Std.string(element.id);
 	}
 }

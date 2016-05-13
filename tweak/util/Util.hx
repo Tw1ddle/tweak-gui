@@ -5,7 +5,8 @@ import haxe.macro.Expr;
 import haxe.macro.Type;
 
 /**
- * Maps Haxe types to string ids
+ * A mapping of basic Haxe types to single character ids.
+ * This is used for converting to 
  */
 @:enum abstract TypeMapping(String) from (String) {
     var BOOL = "b";
@@ -17,9 +18,11 @@ import haxe.macro.Type;
 class Util
 {
 	/**
-	 * 
-	 * @param	f
-	 * @return
+	 * Macro that returns a string representing the given function's type signature.
+	 * Only works for types or abstracts extending the types in the TypeMapping enum. Throws a compile time error for unsupported types.
+	 * Should work for: Bool, Float, Int and String.
+	 * @param	f	The function to extract function parameter types from.
+	 * @return	A string, where each character represents the type of the nth function parameter.
 	 */
     public macro static function getTypes(f:Expr):ExprOf<String> {
         var type:Type = Context.typeof(f);
@@ -56,8 +59,12 @@ class Util
         return macro $v{signature};
     }
 	
-	// Macro that returns the full type names of function parameters (excluding package names)
-	// Doesn't support functions, generics and probably other stuff
+	/**
+	 * Macro that gets the type names of the given function parameters. Doesn't support generic functions, parameters that are themselves functions, and probably many other cases.
+	 * @param	f	The function to extract the parameter types from.
+	 * @return	An array of strings, where each string contains the type name of a function parameter, excluding the package name.
+	 */ 
+	@:dox(hide)
 	public macro static function getFunctionParameterTypes(f:Expr):ExprOf<Array<String>> {
 		var type:Type = Context.typeof(f);
 		if (!Reflect.hasField(type, 'args')) {

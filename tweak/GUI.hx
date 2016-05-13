@@ -13,17 +13,17 @@ import tweak.backend.stub.StubBackend;
 #end
 
 import tweak.backend.IBackend;
-import tweak.elements.Folder;
+import tweak.gui.Folder;
 
 /**
- * A GUI instance is the starting point for all tweak-gui projects. It is a top level folder which holds child Folders and Properties.
- * You can instantiate multiple GUIs - these will exist side-by-side in the layout provided by your chosen tweak-gui backend.
+ * A GUI is a top level graphical container for Folders and Properties. A GUI instance is the starting point for all tweak-gui projects.
+ * Multiple GUIs can be instantiated and exist side-by-side. A GUI is actually a type of folder, and may be identical, depending on the tweak-gui backend used.
  */
 class GUI extends Folder {
 	/**
-	 * Instantiate a new GUI with the given display name
-	 * @param	name	The display name of the GUI folder
-	 * @return	The new GUI for chaining
+	 * Instantiate a new GUI with the given display name.
+	 * @param	name	The display name of the GUI folder.
+	 * @return	The new GUI for chaining.
 	 */ 
 	public static function create(name:String):GUI {
 		Sure.sure(name != null);
@@ -31,9 +31,9 @@ class GUI extends Folder {
 	}
 	
 	/**
-	 * Instantiate a new GUI
-	 * Private constructor, because the tweak-gui interface is fluent
-	 * @param	name	The display name of the GUI folder
+	 * Instantiate a new GUI.
+	 * Private constructor, because the tweak-gui interface is fluent.
+	 * @param	name	The display name of the GUI folder.
 	 */
 	private function new(name:String) {
 		super(name, null);
@@ -42,8 +42,8 @@ class GUI extends Folder {
 	}
 	
 	/**
-	 * Instantiates a backend for this GUI instance
-	 * @return	A backend instance for this GUI
+	 * Instantiate a backend for this GUI instance.
+	 * @return	A backend instance for this GUI.
 	 */ 
 	private inline function instantiateBackend():IBackend {
 		#if tweak_customdombackend
