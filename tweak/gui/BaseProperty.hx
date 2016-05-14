@@ -14,7 +14,7 @@ class BaseProperty extends BaseElement {
 	public var signal_changed(default, null):Signal2<Dynamic, Dynamic>;
 	
 	/**
-	 * Creates a BaseProperty with the specified name.
+	 * Creates a new BaseProperty with the specified name.
 	 * @param	name	The name of the property.
 	 */
 	public function new(?name:String) {

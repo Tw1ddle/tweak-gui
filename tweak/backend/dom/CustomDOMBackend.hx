@@ -10,14 +10,13 @@ import js.html.LIElement;
 import js.html.SelectElement;
 import js.html.TextAreaElement;
 import js.html.UListElement;
+import tweak.gui.BaseElement;
 import tweak.gui.Folder;
 import tweak.gui.FunctionProperty;
 import tweak.gui.Property;
-import tweak.util.Util.TypeMapping;
-import tweak.gui.BaseElement;
 
 /**
- * A custom JavaScript/DOM backend for tweak-gui.
+ * A custom HTML5 JavaScript/DOM backend for tweak-gui with no dependencies.
  */ 
 @:access(tweak.gui.Folder)
 class CustomDOMBackend implements IBackend {
@@ -201,14 +200,6 @@ class CustomDOMBackend implements IBackend {
 		propertyListItem.appendChild(placeholder);
 	}
 	
-	/*
-	public function addBooleanSwitch(folder:Folder, property:Property):Void {
-		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-boolean-switch-swatch");
-		var switchElement = createSwitch(property);
-		propertyListItem.appendChild(switchElement);
-	}
-	*/
-	
 	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		var propertyListItem = addLabelPropertyShell(folder, property, "tweak-gui-boolean-checkbox-swatch");
 		var checkbox = createCheckbox(property);
@@ -382,48 +373,6 @@ class CustomDOMBackend implements IBackend {
 		
 		return checkbox;
 	}
-	
-	/*
-	private inline function createSwitch(property:Property):DivElement {
-		var id = property.name + "-" + Std.string(property.id);
-		
-		var switchContainer = document.createDivElement();
-		switchContainer.className = "tweak-gui-onoffswitch";
-		
-		var inputElement = document.createInputElement();
-		inputElement.type = "checkbox";
-		inputElement.name = "tweak-gui-onoffswitch";
-		inputElement.className = "tweak-gui-onoffswitch-checkbox";
-		inputElement.id = id;
-		inputElement.checked = property.value;
-		
-		var labelElement = document.createLabelElement();
-		labelElement.className = "tweak-gui-onoffswitch-label";
-		labelElement.setAttribute("for", id);
-		
-		var innerSpanElement = document.createSpanElement();
-		innerSpanElement.className = "tweak-gui-onoffswitch-inner";
-		
-		var switchBlockElement = document.createSpanElement();
-		switchBlockElement.className = "tweak-gui-onoffswitch-switch";
-		
-		labelElement.appendChild(innerSpanElement);
-		labelElement.appendChild(switchBlockElement);
-		switchContainer.appendChild(inputElement);
-		switchContainer.appendChild(labelElement);
-		
-		// TODO do this if we're not already "listening", otherwise just do the above?
-		property.signal_changed.add(function(last:Dynamic, current:Dynamic):Void {
-			inputElement.checked = current;
-		});
-		
-		inputElement.addEventListener('change', function(e):Void {
-			property.value = inputElement.checked;
-		}, true);
-		
-		return switchContainer;
-	}
-	*/
 	
 	private inline function createStringEdit(property:Property):InputElement {
 		var id = property.name + "-" + Std.string(property.id);

@@ -1,1 +1,1 @@
-This generates the tweak-gui documentation. TODO
+This project generates the tweak-gui documentation using [dox](https://github.com/HaxeFoundation/dox), the Haxe documentation generator.

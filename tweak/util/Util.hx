@@ -6,7 +6,7 @@ import haxe.macro.Type;
 
 /**
  * A mapping of basic Haxe types to single character ids.
- * This is used for converting to 
+ * This is used for converting basic Haxe parameter types to a shorthand string, a little like a JNI function signature.
  */
 @:enum abstract TypeMapping(String) from (String) {
     var BOOL = "b";

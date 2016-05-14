@@ -13,6 +13,7 @@ import tweak.gui.Folder;
 import tweak.gui.FunctionProperty;
 import tweak.gui.Property;
 import tweak.util.FileReader;
+import tweak.gui.BaseProperty;
 
 /**
  * A haxeui 1.* backend for tweak-gui.
@@ -153,7 +154,7 @@ class HaxeUIBackend implements IBackend {
 		//f.layout.refresh();
 	}
 	
-	private function makeProperty(property:Property):Button {
+	private function makeProperty(property:BaseProperty):Button {
 		var item = new Button();
 		item.id = getPropertyId(property);
 		item.text = property.name;
@@ -164,7 +165,7 @@ class HaxeUIBackend implements IBackend {
 		return Std.string(f.id);
 	}
 	
-	private inline function getPropertyId(p:Property):String {
+	private inline function getPropertyId(p:BaseProperty):String {
 		return Std.string(p.id);
 	}
 	
@@ -174,7 +175,7 @@ class HaxeUIBackend implements IBackend {
 		return folder;
 	}
 	
-	private inline function findProperty(property:Property, folder:Folder):StyleableDisplayObject {
+	private inline function findProperty(property:BaseProperty, folder:Folder):StyleableDisplayObject {
 		var f = findFolder(folder);
 		var property = f.findChild(getFolderId(folder), null, true);
 		Sure.sure(property != null);

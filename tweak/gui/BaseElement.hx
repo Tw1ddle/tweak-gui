@@ -16,7 +16,7 @@ class BaseElement {
 	
 	/**
 	 * Creates a BaseElement with the specified name.
-	 * @param	name	The name of the element.
+	 * @param	name	The name of the element. Falls back to "Unnamed Element" if no name is specified.
 	 */
 	public function new(name:String = "Unnamed Element") {
 		this.name = name;
@@ -24,10 +24,10 @@ class BaseElement {
 	}
 	
 	/**
-	 * Update method.
+	 * Updates the BaseElement.
 	 */
 	public function update():Void {
-		
+		// Intentionally empty.
 	}
 	
 	/**

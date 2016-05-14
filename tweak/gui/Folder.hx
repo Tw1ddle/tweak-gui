@@ -12,7 +12,7 @@ import tweak.gui.Property;
 
 /**
  * A tweak-gui folder. A folder holds properties and other folders.
- * Folders can be opened, closed, or removed from their parent Folder or GUI.
+ * Folders can be opened, closed, shown, hidden and removed from their parent Folder or GUI.
  */
 class Folder extends BaseElement {
 	/**
@@ -83,7 +83,7 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Updates all the properties in this folder, and then calls update on all child folders in an unspecified order.
-	 * Dispatches the didUpdate signal.
+	 * Dispatches the didUpdate signal on completion.
 	 */
 	override public function update():Void {
 		for (property in properties) {
@@ -101,7 +101,7 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Opens this folder.
-	 * @return This folder.
+	 * @return	This folder.
 	 */
 	public function open():Folder {
 		backend.openFolder(this);
@@ -111,7 +111,7 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Collapses this folder.
-	 * @return This folder.
+	 * @return	This folder.
 	 */
 	public function close():Folder {
 		backend.closeFolder(this);
@@ -121,7 +121,7 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Shows this folder.
-	 * @return This folder.
+	 * @return	This folder.
 	 */
 	public function show():Folder {
 		backend.show(this);
@@ -130,7 +130,7 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Hides this folder.
-	 * @return This folder.
+	 * @return	This folder.
 	 */
 	public function hide():Folder {
 		backend.hide(this);
@@ -140,7 +140,7 @@ class Folder extends BaseElement {
 	/**
 	 * Adds a new subfolder with the given display name to this folder.
 	 * @param	name	The display name for the new folder.
-	 * @return	The newly added folder - important, this makes this method different from the rest of the fluid interface.
+	 * @return	The newly added folder - this makes this method different from the rest of the fluid interface.
 	 */
 	public function addFolder(name:String):Folder {
 		Sure.sure(name != null && name.length > 0);
@@ -257,13 +257,26 @@ class Folder extends BaseElement {
 	}
 	
 	/**
-	 * 
+	 * Add a placeholder view to this folder.
+	 * A placeholder is a textual label that acts as a substitute for a regular property edit.
+	 * Placeholders are used for representing properties that tweak-gui cannot handle.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the placeholder.
+	 * @return	This folder.
 	 */
 	public function addPlaceholder<T:{}>(object:T, field:String, ?name:String):Folder {
 		backend.addPlaceholder(this, makeProperty(object, field, name));
 		return this;
 	}
 	
+	/**
+	 * Adds a readonly text area to this folder, that records previous values of the property it watches.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	history	The number of previous property values to retain in the text area.
+	 * @return	This folder.
+	 */
 	public function addWatchTextArea<T:{}>(object:T, field:String, history:Int):Folder {
 		Sure.sure(object != null);
 		Sure.sure(field != null && field.length > 0);
@@ -273,44 +286,84 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
+	/**
+	 * Adds a boolean checkbox property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the checkbox.
+	 * @return	This folder.
+	 */
 	public function addBooleanCheckbox<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addBooleanCheckbox(this, makeProperty(object, field, name));
 		return this;
 	}
 	
-	/*
-	public function addBooleanSwitch<T:{}>(object:T, field:String, ?name:String):Folder {
-		Sure.sure(verifyField(object, field));
-		backend.addBooleanSwitch(this, makeProperty(object, field, name));
-		return this;
-	}
-	*/
-	
+	/**
+	 * Adds a color picker property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the color picker.
+	 * @return	This folder.
+	 */
 	public function addColorPicker<T:{}>(object:T, field:String, ?name:String):Folder {
 		// TODO sure rgb/xyz?
 		backend.addColorPicker(this, makeProperty(object, field, name));
 		return this;
 	}
 	
+	/**
+	 * Adds an enum select property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the enum select.
+	 * @return	This folder.
+	 */
 	public function addEnumSelect<T:{}>(object:T, field:String, ?name:String):Folder {
+		// TODO disambiguate between enum values and enum types
 		Sure.sure(verifyField(object, field));
 		backend.addEnumSelect(this, makeProperty(object, field, name));
 		return this;
 	}
 	
+	/**
+	 * Adds a string select property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	options	The possible string values available to the user.
+	 * @param	name	The display name of the string select.
+	 * @return	This folder.
+	 */
 	public function addStringSelect<T:{}>(object:T, field:String, options:Array<String>, ?name:String):Folder {
 		Sure.sure(verifyField(object, field));
 		backend.addStringSelect(this, makeProperty(object, field, name), options);
 		return this;
 	}
 	
-	public function addItemSelect<T:{}>(object:T, field:String, items:Array<T>, ?name:String):Folder {
+	/**
+	 * Adds a generic item select property to this folder.
+	 * @param	object	The folder to add the property to.
+	 * @param	field	The name of the field on the object.
+	 * @param	options	The possible item values available to the user.
+	 * @param	name	The display name of the item select.
+	 * @return	This folder.
+	 */
+	public function addItemSelect<T:{}>(object:T, field:String, options:Array<T>, ?name:String):Folder {
 		// TODO? dropdown list of anything
 		return this;
 	}
 	
+	/**
+	 * Adds a numeric slider property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the numeric slider.
+	 * @param	min	The minimum value of the slider.
+	 * @param	max The maximum value of the slider.
+	 * @return	This folder.
+	 */
 	public function addNumericSlider<T:{}>(object:T, field:String, ?name:String, ?min:Null<Float>, ?max:Null<Float>):Folder {
+		// TODO add step
 		Sure.sure(verifyField(object, field));
 		
 		if (min == null) {
@@ -324,15 +377,41 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// TODO add min, max, step
+	/**
+	 * Adds a numeric spinbox property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the numeric spinbox.
+	 * @return	This folder.
+	 */
 	public function addNumericSpinbox<T:{}>(object:T, field:String, ?name:String):Folder {
+		// TODO add step
 		Sure.sure(verifyField(object, field));
 		backend.addNumericSpinbox(this, makeProperty(object, field, name));
 		return this;
 	}
 	
-	//public function addNumericGraph // TODO
+	/**
+	 * Adds a numeric graph element that graphs the previous values of the property it watches.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the folder.
+	 * @return	This folder.
+	 */
+	public function addNumericGraph<T:{}>(object:T, field:String, ?name:String):Folder {
+		// TODO add step etc
+		Sure.sure(verifyField(object, field));
+		backend.addNumericGraph(this, makeProperty(object, field, name));
+		return this;
+	}
 	
+	/**
+	 * Adds a string edit property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the string edit.
+	 * @return	This folder.
+	 */
 	public function addStringEdit<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(verifyField(object, field));
@@ -341,6 +420,13 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
+	/**
+	 * Adds a function triggering property to this folder.
+	 * @param	func	The function that will be added as a triggerable property.
+	 * @param	parameterTypes	Shorthand representation of the type signature of the function. See the Util.hx TypeMapping.
+	 * @param	name	The display name of the function property.
+	 * @return	This folder.
+	 */
 	public function addFunction(func:Dynamic, parameterTypes:String, ?name:String):Folder {
 		Sure.sure(func != null);
 		Sure.sure(Reflect.isFunction(func));
@@ -350,17 +436,11 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Convenience method that creates a new folder, adds the object to it, and adds it to this folder
-	public function addFolderForObject<T:{}>(object:T, name:String):Folder {
-		Sure.sure(object != null);
-		Sure.sure(name != null && name.length > 0);
-		
-		var folder = addFolder(name);
-		folder.addObject(object);
-		return this;
-	}
-	
-	// Add the object's fields to the GUI as properties
+	/**
+	 * Adds the object's fields to this folder as properties.
+	 * @param	object	The object whose properties will be added to this folder.
+	 * @return	This folder.
+	 */
 	public function addObject<T:{}>(object:T):Folder {
 		Sure.sure(object != null);
 		
@@ -373,19 +453,29 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	public function addFolderForObjectWatch<T:{}>(object:T, name:String, history:Int = 50):Folder {
+	/**
+	 * Convenience method that creates a new folder, adds it to this folder, and populates the new folder with properties from the given object.
+	 * @param	object	The object whose fields will be added to the new folder.
+	 * @param	name	The display name of the folder.
+	 * @return	This folder.
+	 */
+	public function addFolderForObject<T:{}>(object:T, name:String):Folder {
 		Sure.sure(object != null);
 		Sure.sure(name != null && name.length > 0);
 		
 		var folder = addFolder(name);
-		folder.addWatchObject(object, name, history);
+		folder.addObject(object);
 		return this;
 	}
 	
-	// Adds the object's fields to the GUI as watches
-	public function addWatchObject<T:{}>(object:T, name:String, history:Int):Folder {
+	/**
+	 * Adds the object's fields to this folder as watch properties.
+	 * @param	object	The object whose properties will be added to this folder as watch properties.
+	 * @param	history	The number of previous values the watch views will display.
+	 * @return	This folder.
+	 */
+	public function addWatchObject<T:{}>(object:T, history:Int):Folder {
 		Sure.sure(object != null);
-		Sure.sure(name != null && name.length > 0);
 		Sure.sure(history >= 0);
 		
 		var fields = getFields(object);
@@ -397,15 +487,28 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Adds a graph widget that plots the value every time it changes
-	public function addNumericGraph<T:{}>(object:T,field:String, ?name:String):Folder {
+	/**
+	 * Convenience method that creates a new folder, adds it to this folder, and populates the new folder with watch properties from the given object.
+	 * @param	object	The object whose fields will be added to the new folder as watch properties.
+	 * @param	name	The display name of the folder.
+	 * @param	history	The number of previous values the watch views will display.
+	 * @return	This folder.
+	 */
+	public function addFolderForObjectWatch<T:{}>(object:T, name:String, history:Int = 5):Folder {
 		Sure.sure(object != null);
-		Sure.sure(field != null && field.length > 0);
+		Sure.sure(name != null && name.length > 0);
 		
+		var folder = addFolder(name);
+		folder.addWatchObject(object, history);
 		return this;
 	}
 	
-	// Adds an object's fields the GUI, excluding fields in the provided array
+	/**
+	 * Adds an object's fields to this folder, excluding fields in the provided array.
+	 * @param	object	The object whose fields will be added to this folder.
+	 * @param	excludeFields	The fields of the object that will not be added as properties.
+	 * @return	This folder.
+	 */
 	public function addObjectExcludingFields<T:{}>(object:T, excludeFields:Array<String>):Folder {
 		Sure.sure(object != null);
 		Sure.sure(excludeFields != null);
@@ -413,7 +516,7 @@ class Folder extends BaseElement {
 		var fields = Reflect.fields(object);
 		
 		for (field in fields) {
-			if (excludeFields != null && excludeFields.indexOf(field) == -1) {
+			if (excludeFields.indexOf(field) == -1) {
 				continue;
 			}
 			
@@ -423,7 +526,12 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
-	// Attempts to add only the provided fields to the object's GUI
+	/**
+	 * Adds an object's fields to this folder, only including the fields in the provided array.
+	 * @param	object	The object whose fields will be added to this folder.
+	 * @param	includeFields	The fields of the object that will be added as properties.
+	 * @return	This folder.
+	 */
 	public function addObjectIncludingFields<T:{}>(object:T, includeFields:Array<String>):Folder {
 		Sure.sure(object != null);
 		Sure.sure(includeFields != null);
@@ -438,6 +546,12 @@ class Folder extends BaseElement {
 		return this;
 	}
 	
+	/**
+	 * Helper method that creates a property.
+	 * @param	object	The object whose field will be used to create the property.
+	 * @param	field	The name of the field on the object.
+	 * @return	A new property.
+	 */
 	private inline function makeProperty<T:{}>(object:T, field:String, ?name:String):Property {
 		Sure.sure(object != null);
 		Sure.sure(field != null);
@@ -448,6 +562,13 @@ class Folder extends BaseElement {
 		return property;
 	}
 	
+	/**
+	 * Helper method that creates a function property.
+	 * @param	func	The function that will be added as a triggerable property.
+	 * @param	parameterTypes	Shorthand representation of the type signature of the function. See the Util.hx TypeMapping.
+	 * @param	name	The display name of the function property.
+	 * @return	This folder.
+	 */
 	private inline function makeFunctionProperty<T:Function>(func:T, parameterTypes:String, ?name:String):FunctionProperty {
 		Sure.sure(func != null);
 		Sure.sure(parameterTypes != null);
@@ -458,7 +579,11 @@ class Folder extends BaseElement {
 		return property;
 	}
 	
-	// Folders aren't created directly, use addFolder
+	/**
+	 * Creates a new folder. Folders aren't created directly by users, they use addFolder methods instead.
+	 * @param	name	The display name of the folder.
+	 * @param	parent	The parent of the folder.
+	 */
 	private function new(name:String, parent:Folder) {
 		super(name);
 		if (parent != null) {
@@ -469,7 +594,12 @@ class Folder extends BaseElement {
 		this.properties = new Array<BaseProperty>();
 	}
 	
-	private function getFields<T:{}>(object:T):Array<String> {
+	/**
+	 * Returns the field names of an object in a cross-platform way.
+	 * @param	object	The object whose fields will be returned.
+	 * @return	The field names of the object.
+	 */
+	private static function getFields<T:{}>(object:T):Array<String> {
 		Sure.sure(object != null);
 		
 		#if js
@@ -489,16 +619,25 @@ class Folder extends BaseElement {
 	}
 	
 	#if debug
+	/**
+	 * Debug-mode only method that verifies that an object has the given instance field.
+	 * @param	object	The object whose fields will be checked.
+	 * @param	field	The name of the field.
+	 * @return	True if the field exists on the object, false if it does not.
+	 */
 	private static inline function verifyField<T:{}>(object:T, field:String):Bool {		
 		#if js
 		return object != null && Reflect.hasField(object, field);
 		#else
-		return true;
+		return true; // TODO
 		#end
 	}
 	#else
-	private static inline function verifyField<T:{}>(object:T, field:String):Bool {
-		return true; // TODO?
+	/**
+	 * Debug-mode only method that verifies that an object has the given instance field. Evaluates to nothing here (in release mode).
+	 */
+	private macro static inline function verifyField<T:{}>(object:T, field:String):Bool {
+		return true;
 	}
 	#end
 }
