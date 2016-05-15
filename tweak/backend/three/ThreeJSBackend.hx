@@ -1,5 +1,9 @@
 package tweak.backend.three;
 
+import tweak.gui.Folder;
+import tweak.gui.Property;
+import tweak.gui.FunctionProperty;
+
 /**
  * A three.js backend for tweak-gui
  */

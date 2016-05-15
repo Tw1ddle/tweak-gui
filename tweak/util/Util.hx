@@ -24,8 +24,8 @@ class Util
 	 * @param	f	The function to extract function parameter types from.
 	 * @return	A string, where each character represents the type of the nth function parameter.
 	 */
-    public macro static function getTypes(f:Expr):ExprOf<String> {
-        var type:Type = Context.typeof(f);
+    public macro static function getFunctionSignature(f:Expr):ExprOf<String> {
+        var type:haxe.macro.Type = Context.typeof(f);
         if (!Reflect.hasField(type, 'args')) {
             throw "Parameter has no field 'args'";
         }
@@ -60,10 +60,48 @@ class Util
     }
 	
 	/**
+	 * Macro that returns an array of strings containing the names of the given object's instance fields.
+	 * @param	instance
+	 * @return	An array of strings containing the object's instance field names.
+	 */
+	macro static public function getInstanceFieldNames(instance:Expr):ExprOf<Array<String>> {
+		var type = Context.typeof(instance);
+		var classFields = [];
+		switch(type) {
+			case TInst(cl, _):
+				classFields = cl.get().fields.get();
+			case _:
+				throw "Expression is not of class instance type";
+		}
+		
+		var result = [];
+		for (i in 0...classFields.length) {
+			var cf = classFields[i];
+			result.push(macro $v{cf.name});
+			//trace(cf.name);
+		}
+		return macro $a{result};
+	}
+	
+	/**
+	 * Macro that converts a string into an array of single-character strings.
+	 * @param	source	The string to be split into an array of character strings.
+	 * @return	The array of single-character strings.
+	 */
+	macro static public function stringToArray(source:String):ExprOf<Array<String>> {
+		var result = [];
+		for (i in 0...source.length) {
+			result.push(macro $v{source.charAt(i)});
+		}
+		return macro $a{result};
+	}
+	
+	/**
 	 * Macro that gets the type names of the given function parameters. Doesn't support generic functions, parameters that are themselves functions, and probably many other cases.
 	 * @param	f	The function to extract the parameter types from.
 	 * @return	An array of strings, where each string contains the type name of a function parameter, excluding the package name.
-	 */ 
+	 */
+	/* TODO
 	@:dox(hide)
 	public macro static function getFunctionParameterTypes(f:Expr):ExprOf<Array<String>> {
 		var type:Type = Context.typeof(f);
@@ -89,4 +127,26 @@ class Util
 		}
 		return macro $a{signature};
 	}
+	*/
+	
+	#if debug
+	/**
+	 * Debug-mode assertion that verifies that an object has the given instance field.
+	 * @param	object	The object whose fields will be checked.
+	 * @param	field	The name of the field.
+	 */
+	public static inline function verifyField<T:{}>(object:T, field:String):Void {
+		#if js
+		Sure.sure(object != null && Reflect.hasField(object, field)); // TODO
+		#end
+	}
+	#else
+	/**
+	 * Debug-mode only assertion that verifies that an object has the given instance field.
+	 * @param	object	The object whose fields will be checked.
+	 * @param	field	The name of the field.
+	 */
+	public static inline function verifyField<T:{}>(object:T, field:String):Void {
+	}
+	#end
 }

@@ -5,9 +5,10 @@ import msignal.Signal.Signal1;
 import msignal.Signal.Signal2;
 import tweak.backend.IBackend;
 import tweak.gui.Property;
+import tweak.util.Util;
 
-// TODO disable folder updates when closed, or add an option for that
-// TODO disable properties (stop them from being edited) and disable/enable all folder contents
+// TODO disable folder updates when closed, or add an option for that?
+// TODO disable properties (stop them from being edited) and disable/enable all folder contents from being edited?
 // TODO addFolder/WatchForTypes (only add/watch specific types, exclude only specific types, named fields etc...)
 
 /**
@@ -83,7 +84,6 @@ class Folder extends BaseElement {
 	
 	/**
 	 * Updates all the properties in this folder, and then calls update on all child folders in an unspecified order.
-	 * Dispatches the didUpdate signal on completion.
 	 */
 	override public function update():Void {
 		for (property in properties) {
@@ -100,7 +100,7 @@ class Folder extends BaseElement {
 	}
 	
 	/**
-	 * Opens this folder.
+	 * Opens this folder to an expanded position, showing children.
 	 * @return	This folder.
 	 */
 	public function open():Folder {
@@ -110,7 +110,7 @@ class Folder extends BaseElement {
 	}
 	
 	/**
-	 * Collapses this folder.
+	 * Collapses this folder to a closed position.
 	 * @return	This folder.
 	 */
 	public function close():Folder {
@@ -120,7 +120,7 @@ class Folder extends BaseElement {
 	}
 	
 	/**
-	 * Shows this folder.
+	 * Shows this folder, making it visible to the user.
 	 * @return	This folder.
 	 */
 	public function show():Folder {
@@ -129,7 +129,7 @@ class Folder extends BaseElement {
 	}
 	
 	/**
-	 * Hides this folder.
+	 * Hides this folder, making it invisible to the user.
 	 * @return	This folder.
 	 */
 	public function hide():Folder {
@@ -144,8 +144,6 @@ class Folder extends BaseElement {
 	 */
 	public function addFolder(name:String):Folder {
 		Sure.sure(name != null && name.length > 0);
-		
-		// TODO handle updateWhenClosed?
 		
 		var folder = new Folder(name, this);
 		folders.push(folder);
@@ -294,7 +292,7 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addBooleanCheckbox<T:{}>(object:T, field:String, ?name:String):Folder {
-		Sure.sure(verifyField(object, field));
+		Util.verifyField(object, field);
 		backend.addBooleanCheckbox(this, makeProperty(object, field, name));
 		return this;
 	}
@@ -320,11 +318,26 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addEnumSelect<T:{}>(object:T, field:String, ?name:String):Folder {
-		// TODO disambiguate between enum values and enum types
-		Sure.sure(verifyField(object, field));
+		Util.verifyField(object, field);
 		backend.addEnumSelect(this, makeProperty(object, field, name));
 		return this;
 	}
+	
+	// TODO
+	/**
+	 * Adds an enum select property to this folder.
+	 * @param	object	The object whose field will be added as a property.
+	 * @param	field	The name of the field on the object.
+	 * @param	name	The display name of the enum select.
+	 * @return	This folder.
+	 */
+	/*
+	public function addEnumSelectType<T:Enum>(object:T, field:String, ?name:String):Folder {
+		Util.verifyField(object, field);
+		backend.addEnumSelectType(this, makeProperty(object, field, name));
+		return this;
+	}
+	*/
 	
 	/**
 	 * Adds a string select property to this folder.
@@ -335,7 +348,8 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addStringSelect<T:{}>(object:T, field:String, options:Array<String>, ?name:String):Folder {
-		Sure.sure(verifyField(object, field));
+		Util.verifyField(object, field);
+		Sure.sure(options != null);
 		backend.addStringSelect(this, makeProperty(object, field, name), options);
 		return this;
 	}
@@ -347,11 +361,16 @@ class Folder extends BaseElement {
 	 * @param	options	The possible item values available to the user.
 	 * @param	name	The display name of the item select.
 	 * @return	This folder.
-	 */
+	 *
+	 // TODO
+	/*
 	public function addItemSelect<T:{}>(object:T, field:String, options:Array<T>, ?name:String):Folder {
-		// TODO? dropdown list of anything
+		Util.verifyField(object, field);
+		Sure.sure(options != null);
+		backend.addItemSelect(this, makeProperty(object, field, name), options);
 		return this;
 	}
+	*/
 	
 	/**
 	 * Adds a numeric slider property to this folder.
@@ -363,8 +382,8 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addNumericSlider<T:{}>(object:T, field:String, ?name:String, ?min:Null<Float>, ?max:Null<Float>):Folder {
-		// TODO add step
-		Sure.sure(verifyField(object, field));
+		// TODO add/compute step
+		Util.verifyField(object, field);
 		
 		if (min == null) {
 			min = -1e20;
@@ -385,8 +404,8 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addNumericSpinbox<T:{}>(object:T, field:String, ?name:String):Folder {
-		// TODO add step
-		Sure.sure(verifyField(object, field));
+		// TODO add/compute step
+		Util.verifyField(object, field);
 		backend.addNumericSpinbox(this, makeProperty(object, field, name));
 		return this;
 	}
@@ -399,8 +418,8 @@ class Folder extends BaseElement {
 	 * @return	This folder.
 	 */
 	public function addNumericGraph<T:{}>(object:T, field:String, ?name:String):Folder {
-		// TODO add step etc
-		Sure.sure(verifyField(object, field));
+		// TODO add/compute step
+		Util.verifyField(object, field);
 		backend.addNumericGraph(this, makeProperty(object, field, name));
 		return this;
 	}
@@ -414,7 +433,7 @@ class Folder extends BaseElement {
 	 */
 	public function addStringEdit<T:{}>(object:T, field:String, ?name:String):Folder {
 		Sure.sure(object != null);
-		Sure.sure(verifyField(object, field));
+		Util.verifyField(object, field);
 		
 		backend.addStringEdit(this, makeProperty(object, field, name));
 		return this;
@@ -513,7 +532,7 @@ class Folder extends BaseElement {
 		Sure.sure(object != null);
 		Sure.sure(excludeFields != null);
 		
-		var fields = Reflect.fields(object);
+		var fields = getFields(object);
 		
 		for (field in fields) {
 			if (excludeFields.indexOf(field) == -1) {
@@ -536,10 +555,10 @@ class Folder extends BaseElement {
 		Sure.sure(object != null);
 		Sure.sure(includeFields != null);
 		
-		var fields = Reflect.fields(object);
+		var fields = getFields(object);
 		
 		for (field in includeFields) {
-			Sure.sure(Reflect.hasField(object, field));
+			//Sure.sure(Reflect.hasField(object, field));
 			addProperty(object, field);
 		}
 		
@@ -617,27 +636,4 @@ class Folder extends BaseElement {
 		
 		return []; // TODO
 	}
-	
-	#if debug
-	/**
-	 * Debug-mode only method that verifies that an object has the given instance field.
-	 * @param	object	The object whose fields will be checked.
-	 * @param	field	The name of the field.
-	 * @return	True if the field exists on the object, false if it does not.
-	 */
-	private static inline function verifyField<T:{}>(object:T, field:String):Bool {		
-		#if js
-		return object != null && Reflect.hasField(object, field);
-		#else
-		return true; // TODO
-		#end
-	}
-	#else
-	/**
-	 * Debug-mode only method that verifies that an object has the given instance field. Evaluates to nothing here (in release mode).
-	 */
-	private macro static inline function verifyField<T:{}>(object:T, field:String):Bool {
-		return true;
-	}
-	#end
 }
