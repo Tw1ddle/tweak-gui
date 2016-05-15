@@ -1,1 +1,1 @@
-TODO
+zip -0r tweak-gui.zip tweak haxelib.json include.xml LICENSE README.md CHANGELOG.md
