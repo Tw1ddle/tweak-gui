@@ -92,8 +92,6 @@ class HaxeUIBackend implements IBackend {
 		//f.layout.refresh();
 	}
 	
-	//public function addBooleanSwitch(folder:Folder, property:Property):Void; /* Unimplemented */
-	
 	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		var f = findFolder(folder);
 		f.addChild(makeProperty(property));

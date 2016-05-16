@@ -1,0 +1,345 @@
+/* CSS is arranged from the root of the folder hierarchy to the bottom */
+
+/* Top level container */
+.tweak-gui-root-folder-container
+{
+	min-width: 10vw;
+	width: 300px;
+	float: left;
+	resize: horizontal;
+	overflow: hidden;
+	border: none;
+	margin: 0;
+	padding: 0;
+	
+	/* No text highlight */
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/* Top level folder */
+.tweak-gui-root-folder
+{
+	width: 100%;
+	border: none;
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+}
+
+/* Active when the top level menu is closed */
+.tweak-gui-root-folder.collapsed
+{
+	max-height: 0;
+	transition: max-height .3s cubic-bezier(0, 1, 0, 1) -.1s;
+}
+
+/* A hack for CSS animated opening/closing menus: http://stackoverflow.com/questions/3508605/how-can-i-transition-height-0-to-height-auto-using-css */
+.tweak-gui-root-folder, .tweak-gui-folder-list
+{
+	max-height: 19999px;
+	overflow: hidden;
+	-webkit-transition: max-height 0.3s cubic-bezier(0.5, 0, 1, 0);
+	-moz-transition: max-height 0.3s cubic-bezier(0.5, 0, 1, 0);
+	-ms-transition: max-height 0.3s cubic-bezier(0.5, 0, 1, 0);
+	-o-transition: max-height 0.3s cubic-bezier(0.5, 0, 1, 0);
+	transition: max-height 0.3s cubic-bezier(0.5, 0, 1, 0);
+    transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
+}
+
+/* Root menu visibility toggle button */
+.tweak-gui-root-toggle-button
+{
+	width: 100%;
+	border: 0;
+	outline: 0;
+	font-size: 14px;
+	color: #ffffff;
+	background-color: #000000;
+	text-align: center;
+}
+
+/* Regular non-root folder container */
+.tweak-gui-folder-container
+{
+	padding-left: 6px;
+	border: 0;
+	color: #ffffff;
+}
+
+/* Non-root folder header/buttons container */
+.tweak-gui-folder-button-container
+{
+	width: 100%;
+	min-height: 30px;
+	height: 2vh;
+	border: 0;
+	padding: 0px 5px;
+	outline: none;
+	text-align: left;
+	font-size: 14px;
+	color: #ffffff;
+	background-color: #000000;
+}
+
+/* Toggle button for showing/hiding a folder */
+.tweak-gui-folder-toggle-button
+{
+	width: 90%;
+	min-height: 30px;
+	height: 2vh;
+	text-align: left;
+	border: 0;
+	padding: 0px 5px;
+	outline: none;
+	font-size: 14px;
+	color: #ffffff;
+	background-color: #000000;
+}
+
+/* Show down facing triangle when folder is closed */
+.tweak-gui-folder-toggle-button:before
+{
+	padding-right: 10px;
+	font-size: 12px;
+    content: "\25BC";
+}
+
+/* Show right facing triangle when folder is open */
+.tweak-gui-folder-toggle-button.folder-open:before
+{
+	padding-right: 10px;
+	font-size: 12px;
+    content: "\25B6";
+}
+
+/* Button for removing a folder */
+.tweak-gui-folder-remove-button
+{
+	width: 10%;
+	height: 100%;
+	float: right;
+	background-color: #000000;
+	font-size: 14px;
+	color: #ffffff;
+	border: 0;
+	padding: 0;
+	outline: none;
+}
+
+/* Show "X" symbol for removing the folder */
+.tweak-gui-folder-remove-button:after
+{
+	padding-left: 5px;
+	padding-right: 12px;
+	font-size: 12px;
+	content: "\2716";
+}
+
+/* Non-root folder list element */
+.tweak-gui-folder-list
+{
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+}
+
+/* When the non-root folder is closed */
+.tweak-gui-folder-list.collapsed
+{
+	max-height: 0;
+	transition: max-height .3s cubic-bezier(0, 1, 0, 1) -.1s;
+}
+
+/* Container for a property */
+.tweak-gui-property-container
+{
+    display: -webkit-flex;
+    display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-flex-wrap: nowrap;
+	flex-wrap: nowrap;
+	-webkit-justify-content: flex-start;
+	justify-content: flex-start;
+	-webkit-align-items: baseline;
+	align-items: baseline;
+	
+	position: relative;
+	margin-left: 6px;
+	color: #ffffff;
+	background-color: #303030;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* Small rectanglar swatch that visually indicates the property type */
+.tweak-gui-property-swatch
+{
+	position: absolute;
+	height: 100%;
+	width: 6px;
+	background-color: #000000;
+}
+/* Swatch colors */
+.tweak-gui-placeholder-swatch
+{
+	background-color: #707070;
+}
+.tweak-gui-boolean-checkbox-swatch
+{
+	background-color: #806787;
+}
+.tweak-gui-boolean-switch-swatch
+{
+	background-color: #806787;
+}
+.tweak-gui-function-swatch
+{
+	background-color: #e61d5f;
+}
+.tweak-gui-string-select-swatch
+{
+	background-color: #1ede6f;
+}
+.tweak-gui-enum-select-swatch
+{
+	background-color: #f3cf29;
+}
+.tweak-gui-numeric-spinbox-swatch
+{
+	background-color: #2fa1d6;
+}
+.tweak-gui-string-edit-swatch
+{
+	background-color: #30b36b;
+}
+.tweak-gui-color-picker-swatch
+{
+	background-color: #ffffff;
+}
+.tweak-gui-watch-view-swatch
+{
+	background-color: #ffffaa;
+}
+/* End swatch colors */
+
+/* Text label containing name or description of the property */
+.tweak-gui-property-label
+{
+	min-width: 30%;
+	vertical-align: middle;
+	text-align: left;
+	
+	padding-left: 15px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Placeholder item for things that cannot be represented or properly exposed by tweak-gui yet */
+.tweak-gui-placeholder
+{
+}
+
+/* String edit property edit */
+.tweak-gui-stringedit
+{
+	resize: none;
+	overflow: hidden;
+	
+	outline-width: 0;
+	color: #1ede6f;
+	background-color: #505050;
+	border: 0px;
+	padding: 4px;
+}
+
+/* Numeric spinbox property edit */
+.tweak-gui-numericspinbox
+{	
+	outline-width: 0;
+	color: #2fa1d6;
+	background-color: #505050;
+	border: 0;
+	margin: 0;
+	padding: 4px;
+}
+
+/* Numeric slider property edit */
+.tweak-gui-numericslider
+{	
+	outline-width: 0;
+	color: #2fa1d6;
+	background-color: #505050;
+	padding: 4px;
+}
+
+/* Checkbox button */
+.tweak-gui-checkbox
+{
+	outline-width: 0;
+	vertical-align: middle;
+}
+
+/* Enum dropdown select element */
+.tweak-gui-string-select
+{
+	outline-width: 0;
+	color: #1ede6f;
+	background-color: #505050;
+	border: 0;
+	margin: 0;
+	padding: 4px;
+}
+
+/* String dropdown select element */
+.tweak-gui-enum-select
+{
+	outline-width: 0;
+	color: #f3cf29;
+	background-color: #505050;
+	border: 0;
+	margin: 0;
+	padding: 4px;
+}
+
+/* Run/call function button */
+.tweak-gui-call-function-button
+{
+	outline-width: 0;
+	border: 1;
+	border-color: #505050;
+	background-color: #707070;
+	color: #ff0000;
+	vertical-align: middle;
+}
+
+/* Show "=>" symbol for running the function */
+.tweak-gui-call-function-button:after
+{
+	font-size: 12px;
+	content: "\21E8";
+}
+
+/* Watch view text area */
+.tweak-gui-watch-view
+{
+	width:100%;
+	
+	vertical-align: middle;
+	height: 26px;
+	resize: none;
+	word-wrap: break-word;
+	overflow: hidden;
+	outline-width: 0;
+	color: #ffffaa;
+	background-color: #505050;
+	border: 0;
+	margin: 0;
+	padding: 4px;
+}

@@ -11,7 +11,7 @@ WORK IN PROGRESS
 **tweak-gui** backends are implemented for the following frameworks and Haxe targets:
 
 * Zero-dependency DOM (HTML5/JavaScript).
-* ~~Three.js (JavaScript).~~
+* ~~Three.js (JavaScript/WebGL).~~
 * ~~HaxeUI (Windows, Mac, Linux, Neko, Android, iOS, Flash).~~
 * ~~HaxeFlixel (Windows, Mac, Linux, Neko, Android, iOS, Flash, HTML5/JavaScript).~~
 * ~~Luxe (Windows, Mac, Linux, Android, iOS, HTML5/JavaScript).~~

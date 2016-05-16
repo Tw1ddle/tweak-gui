@@ -517,20 +517,7 @@ class CustomDOMBackend implements IBackend {
 		property.signal_changed.add(function(last:Dynamic, current:Dynamic):Void {
 			// textAreaElement.value = Std.string(current) + "\r\n" + textAreaElement.value;
 			textAreaElement.value = Std.string(current);
-			
-			// TODO add an animation to show it changed
-			//propertyListItem.classList.add("tweak-gui-watch-changed-animation");
 		});
-		
-		/*
-		var removeWatchChangedAnimation = function(e):Void {
-			propertyListItem.classList.remove("tweak-gui-watch-changed-animation");
-		};
-		var animationEndEvents = ['animationend', 'webkitAnimationEnd', 'mozAnimationEnd', 'MSAnimationEnd', 'oAnimationEnd'];
-		for (evt in animationEndEvents) {
-			propertyListItem.addEventListener(evt, removeWatchChangedAnimation, false);
-		}
-		*/
 		
 		textAreaElement.value += Std.string(property.value) + "\r\n";
 		

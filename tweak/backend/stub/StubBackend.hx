@@ -48,8 +48,6 @@ class StubBackend implements IBackend {
 		trace("Adding placeholder " + property.name + " to folder " + folder.name);
 	}
 	
-	//public function addBooleanSwitch(folder:Folder, property:Property):Void; /* Unimplemented */
-	
 	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		trace("Adding boolean checkbox " + property.name + " to folder " + folder.name);
 	}

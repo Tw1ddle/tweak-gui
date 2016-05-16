@@ -1,15 +1,21 @@
 package tweak.backend.three;
 
+import js.three.Object3D;
 import tweak.gui.Folder;
-import tweak.gui.Property;
 import tweak.gui.FunctionProperty;
+import tweak.gui.Property;
 
 /**
- * A three.js backend for tweak-gui
+ * A three.js backend for tweak-gui.
  */
+@:access(tweak.gui.Folder)
 class ThreeJSBackend implements IBackend {
+	private var rootObject:Object3D;
+	private var rootToggleButton:Object3D;
+	
 	public function new() {
-		trace("Initializing stub tweak-gui backend");
+		rootObject = new Object3D();
+		rootToggleButton = new Object3D();
 	}
 	
 	public function show(folder:Folder):Void {
@@ -46,8 +52,6 @@ class ThreeJSBackend implements IBackend {
 	public function addPlaceholder(folder:Folder, property:Property):Void {
 		trace("Adding placeholder " + property.name + " to folder " + folder.name);
 	}
-	
-	//public function addBooleanSwitch(folder:Folder, property:Property):Void; /* Unimplemented */
 	
 	public function addBooleanCheckbox(folder:Folder, property:Property):Void {
 		trace("Adding boolean checkbox " + property.name + " to folder " + folder.name);

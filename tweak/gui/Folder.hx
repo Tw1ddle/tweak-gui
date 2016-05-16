@@ -9,7 +9,7 @@ import tweak.util.Util;
 
 // TODO disable folder updates when closed, or add an option for that?
 // TODO disable properties (stop them from being edited) and disable/enable all folder contents from being edited?
-// TODO addFolder/WatchForTypes (only add/watch specific types, exclude only specific types, named fields etc...)
+// TODO addObject/WatchForTypes (only add/watch specific types, exclude only specific types, named fields etc...)
 
 /**
  * A tweak-gui folder. A folder holds properties and other folders.
@@ -322,22 +322,6 @@ class Folder extends BaseElement {
 		backend.addEnumSelect(this, makeProperty(object, field, name));
 		return this;
 	}
-	
-	// TODO
-	/**
-	 * Adds an enum select property to this folder.
-	 * @param	object	The object whose field will be added as a property.
-	 * @param	field	The name of the field on the object.
-	 * @param	name	The display name of the enum select.
-	 * @return	This folder.
-	 */
-	/*
-	public function addEnumSelectType<T:Enum>(object:T, field:String, ?name:String):Folder {
-		Util.verifyField(object, field);
-		backend.addEnumSelectType(this, makeProperty(object, field, name));
-		return this;
-	}
-	*/
 	
 	/**
 	 * Adds a string select property to this folder.
