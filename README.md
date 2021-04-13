@@ -1,10 +1,4 @@
-WORK IN PROGRESS
-
-[LOGO here](TODO)
-
-**tweak-gui** is a Haxe library that provides a **simple to use** graphical user interface for changing variables on the fly. Get started with the [demo](TODO) and [interactive documentation](TODO).
-
-[DEMO screenshots here](TODO)
+**tweak-gui** is an unfinished Haxe library that was intended to provide a **simple to use** graphical user interface for changing variables on the fly. It's completely unfinished, don't use this.
 
 ## Features
 
@@ -29,24 +23,9 @@ The following features and widgets are [available](TODO interactive documentatio
 * Text Watch Areas.
 * Folder Groups.
 
-## Install
-
-Install the library via [haxelib](TODO link to haxelib):
-	
-```
-haxelib install tweak-gui
-```
-
 ## Usage
 
 Include tweak-gui in your Haxe project and set the haxedef for the preferred backend.
-
-TODO: list the backend defines and explain how to do it for OpenFL project.xml and .hxml etc.
-
-TODO:
-Basic usage example and screenshots
-Basic usage using the Util.hx macros
-Links to demos
 
 ## Notes
 * Written in Haxe, inspired by the popular [dat.gui](https://github.com/dataarts/dat.gui) library, [ofxDatGui](https://github.com/braitsch/ofxDatGui) for OpenFrameworks, and [AntTweakBar](http://anttweakbar.sourceforge.net/doc/).
